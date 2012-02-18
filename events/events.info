@@ -1,0 +1,4 @@
+name = Events
+description = Events Functions
+core = 7.x
+package = Custom

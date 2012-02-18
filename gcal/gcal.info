@@ -1,0 +1,4 @@
+name = Google Calendar
+description = Integrates with my google calendar account
+core = 7.x
+package = custom

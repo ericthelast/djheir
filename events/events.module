@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * Implements hook_node_view().
+ */
+function events_node_view($node, $mode, $langcode) {
+	if($mode == 'full' && $node->type == 'event') {
+		$node->content['total_payments'] = array(
+			'#type' => 'item',
+			'#title' => t('Total Payments'),
+			'#markup' => events_get_event_total_payments($node),
+			'#weight' => 10,
+		);
+	}
+}
+
+function events_get_event_total_payments($event) {
+	$query = new EntityFieldQuery;
+	$query
+		->entityCondition('entity_type', 'node')
+		->propertyCondition('type', 'payment')
+		->propertyCondition('status', 1)
+		->fieldCondition('field_event', 'nid', $event->nid);
+	$result = $query->execute();
+	if(empty($result)) {
+		return '$0';
+	}
+	$nids = array_keys($result['node']);
+	$nodes = node_load_multiple($nids);
+	$total = 0;
+	foreach ($nodes as $payment) {
+		$amount = field_get_items('node', $payment, 'field_amount');
+		$total += $payment->field_amount['und'][0]['value'];
+	}
+
+	return '$' . number_format($total, 2);
+}
